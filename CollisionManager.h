@@ -5,8 +5,7 @@ public:
 	void AddTags(String pathTag);
 
 	CollisionManager(float x, float y ,  float sx, float sy, 
-					 String pathTag,
-					 Vector2 opposite, Vector2 side, Vector2 behind );
+					 String pathTag, Vector2 side);
 
 	~CollisionManager(void);
 
