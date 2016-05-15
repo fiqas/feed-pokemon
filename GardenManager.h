@@ -11,27 +11,31 @@ public:
 	virtual ~GardenManager(void);
 	
 	void CreatePokemon(float x, float y , float sizex, float sizey, String pathName);
-	void CreateCollisionManager(float x, float y ,  float sx, float sy, String pathTag, Vector2 side);
+	void CreateCollisionManager(float x, float y ,  float sx, float sy, String pathTag, Vector2 side, String number);
 	void AddCollisionManager();
 	void AddPokemons();
 	void Update(float dt);
 	void ReceiveMessage(Message* message);
 	void Text(String display_text);
 	void CloseText();
-	void SynonymsLoader();
-	void DoThings();
-	void Analyze(int toDo);
-	void FindTaggedPokemons(ActorSet& bothTaggedActors, String adjective, String noun);
 	
 	virtual void MouseDownEvent(Vec2i screenCoordinates, MouseButtonInput button);
 
+	void Analyze(int toDo);
+	Actor* ChooseTarget();
+	void UpdatePokemonStatistics();
+	void InspectDishes();
+	bool CheckDish(String number, String pick);
+	void LoadNeuralNetwork();
 
 	Pikachu* pikachu;
+	ActorSet pokemons;
 	Actor* concretepokemon;
 	FullScreenActor* text_screen;
 	FullScreenActor* pikachuOnAcid;
 	TextActor* text;
 	bool close_text_frame;
+	std::map<String, float> NeuralNetwork;
 
 	AngelSampleHandle pikachuOrder;
 	AngelSampleHandle pikachuQuestion;
@@ -41,19 +45,9 @@ public:
 	int counter;
 	int* counterPtr;
 
-	bool *finished_step;
-	bool finished;
-
-	std::vector<String> synonymsOfFight;
-	std::vector<String> synonymsOfTalk;
-	std::vector<String> synonymsOfHide;
-	std::vector<String> synonymsOfGo;
 	std::vector <String> TargetList;
 
-	String specified_adjective;
-	String specified_noun;
 
 	String sentence;
 
 };
-

@@ -9,15 +9,12 @@ Pikachu::Pikachu(void) {
 	SetPosition(0,0);
 	LoadSpriteFrames("Resources/Images/pikachu/pikachu_001.png", GL_CLAMP, GL_LINEAR);
 	SetSpriteFrame(2);
-	SetLayer(2);
+	SetLayer(5);
 
 	walkingright = false;
 	walkingleft = false;
 	walkingup = false;
 	walkingdown = false;
-
-	talkMode = false;
-	fightMode = false; 
 
 	_pathIndex = 0;
 
@@ -62,7 +59,8 @@ void Pikachu::GoTo(Vector2 newDestination) {
 	//Funkcja tworz¹ca œcie¿kê.
 	Vector2List pathTest;
 	theSpatialGraph.GetPath(GetPosition(), newDestination, pathTest);
-	
+	distanceWalked = 0;
+
 	if (pathTest.size() > 0) {
 
 		_pathPoints = pathTest;
@@ -81,6 +79,7 @@ void Pikachu::GetToNextPoint() {
 
 	Vector2 next = _pathPoints[++_pathIndex];
 	distance = Vector2::Distance(_position, next);
+	distanceWalked += distance;
 	time = distance / 4.0f;
 	angle = Angle(Vector2(10,0), Vector2(next.X - GetPosition().X, next.Y - GetPosition().Y));	
 
@@ -130,69 +129,32 @@ void Pikachu::MouseDownEvent(Vec2i screenCoordinates, MouseButtonInput button) {
 		chat->SetDisplayString("");
 	}
 
-
 }
-
-void Pikachu::Fight() {
-
-	std::cout << pathName << std::endl;
-	actioner->LoadSpriteFrames(pathName, GL_CLAMP, GL_LINEAR);
-	actioner->SetLayer(5);
-
-	if (pokemonType == "trawiasty" || pokemonType == "ognisty" || pokemonType == "psychiczny" || pokemonType == "elektryczny" ) {
-
-		theSound.PlaySound(sadPikachuSound);
-		actioner -> PlaySpriteAnimation(4.0f, SAT_OneShot, 0, 1, "Fighting");
-
-	}
-
-	if (pokemonType == "wodny" || pokemonType == "truj¹cy" || pokemonType == "normalny") {
-		
-		theSound.PlaySound(happyPikachuSound);
-		actioner -> PlaySpriteAnimation(4.0f, SAT_OneShot, 0, 1, "Fighting");
-
-	}
-
-	theSound.PlaySound(battleSound);
-	
-	fightMode = false;
-
-}
-
 
 
 void Pikachu::Talk() {
-
-	std::vector<String> chats;
-	std::fstream file;
-	file.open(pathName, std::ios::in);
-
-	if( file.good() ) {
-		
-		String line;
-
-		while ( !file.eof() ) {
-
-			getline(file, line);
-			chats.push_back(line);
-
-		}
-		
-		file.close();
-	
-	} else std::cout << "Err! file : " << pathName << " not found."  << std::endl;
 
 	theSound.PlaySound(pikachuTalking);
 	pikachuDialoguePokemon = theSound.LoadSample("Resources/Sounds/" + pokemonName + ".wav", false);
 	theSound.PlaySound(pikachuDialoguePokemon);
 
-	int quote = ( std::rand() % 3 ) + 0;
+	String proposition = "I offer you a dish XYZ!";
 	chat_screen->SetSprite("Resources/Images/text_001.png", 0, GL_CLAMP, GL_LINEAR);
 	chat_screen->SetLayer(10);
-	chat->SetDisplayString(chats[quote]);
+	chat->SetDisplayString(proposition);
 
-	talkMode = false;
+	if(customer_served->IsTagged("CZEKA_NA_KELNERA")) {
+		customer_served->FillDish("1");
+		customer_served->Untag("CZEKA_NA_KELNERA");
+		customer_served->Tag("JE");
+	}
 
+	//else if(customer_served->IsTagged("CZEKA_NA_RACHUNEK")) {
+	//	customer_served->FillDish("1");
+	//}
+	customer_served->pokemons_since_last_visited = 0;
+	customer_served->walked_since_last_visited = 0;
+	theSwitchboard.Broadcast(new Message("UpdateStatistics"));
 }
 
 void Pikachu::ReceiveMessage(Message* message) {
@@ -203,18 +165,15 @@ void Pikachu::ReceiveMessage(Message* message) {
 		
 		if (_pathIndex < _pathPoints.size() - 1) GetToNextPoint();
 
-		
-
 		else {
 
 			//Kiedy przeszliœmy przez wszystkie wierzcho³ki na naszej œcie¿ce.
 			theSwitchboard.Broadcast(new Message("EndPointReached", this));
 			_pathPoints.clear();
 			_pathIndex = 0;
+			std::cout << distanceWalked << std::endl;
 
-			if (fightMode == true) Fight();
-			if (talkMode == true) Talk();
-
+			Talk();
 
 		}
 

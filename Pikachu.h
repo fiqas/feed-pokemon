@@ -26,6 +26,7 @@ public:
 	float distance;
 	double Angle(Vector2 position, Vector2 destination);
 	Vector2 currentPosition;
+	float distanceWalked;
 
 	bool walkingright;
 	bool walkingleft;
@@ -36,6 +37,7 @@ public:
 	String pokemonType;
 	String pokemonName;
 	Actor* actioner;
+	CollisionManager* customer_served;
 
 	AngelSampleHandle happyPikachuSound;
 	AngelSampleHandle sadPikachuSound;
@@ -48,8 +50,6 @@ public:
 
 	FullScreenActor* chat_screen;
 	TextActor* chat;
-	bool fightMode;
-	bool talkMode;
 
 };
 
