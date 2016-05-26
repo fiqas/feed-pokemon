@@ -9,7 +9,7 @@ Pikachu::Pikachu(void) {
 	SetPosition(0,0);
 	LoadSpriteFrames("Resources/Images/pikachu/pikachu_001.png", GL_CLAMP, GL_LINEAR);
 	SetSpriteFrame(2);
-	SetLayer(5);
+	SetLayer(3);
 
 	walkingright = false;
 	walkingleft = false;

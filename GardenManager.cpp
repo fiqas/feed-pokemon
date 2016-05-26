@@ -87,10 +87,34 @@ void GardenManager::LoadNeuralNetwork() {
 
 }
 
+//Wersja nieodpytujaca sieci neuronowej skryptem Pythonowym, odkomentowac 
+//i zakomentowac to na dole, jak nie ma siê zainstalowanej Anacondy z PyBrain i OpenCV
+
+//bool GardenManager::CheckDish(String number, String pick) {
+//	String key = number + "_" + pick;
+//	if(NeuralNetwork[key] < 0.5) return true;
+//	else return false;
+//}
+
 bool GardenManager::CheckDish(String number, String pick) {
-	String key = number + "_" + pick;
-	if(NeuralNetwork[key] < 0.5) return true;
-	else return false;
+	String image_path = "Resources/Images/dishes/" + number + "_" + pick + ".png";
+	std::string command = "C:\\Anaconda2\\python.exe ask_network.py " + image_path + " > output.txt";
+	const char * c = command.c_str();
+	int status = system(c);
+	if(status == 0) {
+
+		std::ifstream fin("output.txt");
+		float neural_output;
+		while (fin >> neural_output) {}
+		std::cout << neural_output << std::endl;
+		if(neural_output < 0.5) return true;
+		else return false;
+
+	}
+	else {
+		std::cout << "BLAD" << std::endl;
+		return false;
+	}
 }
 
 void GardenManager::InspectDishes() {
@@ -99,7 +123,7 @@ void GardenManager::InspectDishes() {
 		CollisionManager* customer;
 		customer = dynamic_cast < CollisionManager* >(customer_temp);
 		
-		if(CheckDish(customer->_number, customer->_pick) && customer->IsTagged("JE")) {
+		if(customer->IsTagged("JE") && CheckDish(customer->_number, customer->_pick)) {
 			customer->Untag("JE");
 			customer->Tag("CZEKA_NA_RACHUNEK");
 			std::cout << "SIEC " << customer->GetName() << std::endl; 

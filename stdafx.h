@@ -13,5 +13,6 @@
 #include "vector"
 #include <windows.h>
 #include "map"
+#include <stdlib.h>
 
 // TODO: reference additional headers your program requires here
