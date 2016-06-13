@@ -1,0 +1,3 @@
+Squirtle
+pokemon
+20,tak,nie,wodny

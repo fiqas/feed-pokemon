@@ -1,0 +1,3 @@
+Bulbasaur
+pokemon
+10,tak,nie,roślinny

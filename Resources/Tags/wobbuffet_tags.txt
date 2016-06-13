@@ -1,0 +1,3 @@
+Wobbuffet
+pokemon
+50,tak,nie,wodny

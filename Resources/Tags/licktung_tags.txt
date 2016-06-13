@@ -1,0 +1,3 @@
+Licktung
+pokemon
+50,tak,nie,normalny

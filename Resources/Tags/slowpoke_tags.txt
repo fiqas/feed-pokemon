@@ -1,0 +1,3 @@
+Slowpoke
+pokemon
+40,nie,nie,wodny

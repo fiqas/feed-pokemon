@@ -1,0 +1,3 @@
+Rapidash
+pokemon
+60,tak,nie,ognisty
