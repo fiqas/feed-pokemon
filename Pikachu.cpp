@@ -131,14 +131,6 @@ void Pikachu::MouseDownEvent(Vec2i screenCoordinates, MouseButtonInput button) {
 
 }
 
-void Pikachu::Proposition(String customer_name){
-	String command = "copy /Y Resources\\Tags\\" + customer_name + "_tags.txt pokemon.csv" ;
-	const char* conv = command.c_str();
-	std::cout << conv << std::endl;
-	system(conv);
-	system("python program.py");
-	
-}
 
 void Pikachu::Talk() {
 
@@ -146,28 +138,16 @@ void Pikachu::Talk() {
 	pikachuDialoguePokemon = theSound.LoadSample("Resources/Sounds/" + pokemonName + ".wav", false);
 	theSound.PlaySound(pikachuDialoguePokemon);
 
+	String proposition = "I offer you a dish XYZ!";
+	chat_screen->SetSprite("Resources/Images/text_001.png", 0, GL_CLAMP, GL_LINEAR);
+	chat_screen->SetLayer(10);
+	chat->SetDisplayString(proposition);
+
 	if(customer_served->IsTagged("CZEKA_NA_KELNERA")) {
 		customer_served->FillDish("1");
 		customer_served->Untag("CZEKA_NA_KELNERA");
-		Proposition(customer_served->GetName());
 		customer_served->Tag("JE");
 	}
-	
-	std::fstream file;
-	file.open("result", std::ios::in);
-	String result;
-
-	if( file.good() ) {
-		while ( !file.eof() ) {
-			getline(file, result);
-		}
-		file.close();
-	}	
-
-	String proposition = customer_served->GetName() + " : " + result ;
-	chat_screen->SetSprite("Resources/Images/text_001.png", 0.5, GL_CLAMP, GL_LINEAR);
-	chat_screen->SetLayer(10);
-	chat->SetDisplayString(proposition);
 
 	//else if(customer_served->IsTagged("CZEKA_NA_RACHUNEK")) {
 	//	customer_served->FillDish("1");

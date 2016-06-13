@@ -15,7 +15,6 @@ public:
 	void Fight();
 	void Talk();
 	void Text(String display_text);
-	void Proposition(String customer_name);
 	virtual void MouseDownEvent(Vec2i screenCoordinates, MouseButtonInput button);
 
 	double scalar;
