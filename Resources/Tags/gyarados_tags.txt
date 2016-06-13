@@ -1,3 +1,0 @@
-Gyarados
-pokemon
-80,nie,nie,wodny

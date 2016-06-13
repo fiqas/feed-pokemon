@@ -1,3 +1,0 @@
-Pidgeot
-pokemon
-20,tak,nie,normalny

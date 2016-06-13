@@ -1,3 +1,0 @@
-Staryu
-pokemon
-10,tak,nie,wodny

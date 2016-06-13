@@ -1,3 +1,0 @@
-Rattata
-pokemon
-5,nie,nie,normalny

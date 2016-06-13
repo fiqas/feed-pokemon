@@ -1,3 +1,0 @@
-Mewtwo
-pokemon
-30,nie,tak,psychiczny

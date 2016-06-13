@@ -1,3 +1,0 @@
-Psyduck
-pokemon
-30,tak,tak,wodny
