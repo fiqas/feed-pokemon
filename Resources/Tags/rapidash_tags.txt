@@ -1,5 +1,3 @@
 Rapidash
-czerwony
-ognisty
-koñ
 pokemon
+60,tak,nie,ognisty

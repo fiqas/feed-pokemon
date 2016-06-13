@@ -1,5 +1,3 @@
 Psyduck
-¿ó³ty
-wodny
-kaczka
 pokemon
+30,tak,tak,wodny

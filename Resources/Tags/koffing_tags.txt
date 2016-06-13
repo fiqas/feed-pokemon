@@ -1,5 +1,3 @@
 Koffing
-fioletowy
-truj¹cy
-kulka
 pokemon
+20,nie,nie,trujÄ…cy

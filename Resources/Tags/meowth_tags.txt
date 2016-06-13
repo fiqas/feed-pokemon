@@ -1,5 +1,3 @@
 Meowth
-bia³y
-normalny
-kot
 pokemon
+20,nie,nie,normalny

@@ -1,5 +1,3 @@
 Pidgeot
-pomarañczowy
-normalny
-ptak
 pokemon
+20,tak,nie,normalny

@@ -1,5 +1,3 @@
 Arbok
-fioletowy
-truj¹cy
-w¹¿
 pokemon
+20,nie,nie,trujÄ…cy

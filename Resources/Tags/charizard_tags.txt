@@ -1,5 +1,3 @@
 Charizard
-czerwony
-ognisty
-smok
 pokemon
+100,nie,nie,ognisty

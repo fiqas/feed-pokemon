@@ -1,5 +1,3 @@
 Caterpie
-zielony
-trawiasty
-robak
 pokemon
+5,nie,nie,robak

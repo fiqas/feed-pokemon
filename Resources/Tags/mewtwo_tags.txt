@@ -1,5 +1,3 @@
 Mewtwo
-fioletowy
-psychiczny
-kosmita
 pokemon
+30,nie,tak,psychiczny

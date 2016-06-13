@@ -1,5 +1,3 @@
 Muk
-fioletowy
-truj¹cy
-galareta
 pokemon
+40,nie,nie,trujÄ…cy

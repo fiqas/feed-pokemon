@@ -1,5 +1,3 @@
 Bulbasaur
-zielony
-roúlinny
-roúlina
 pokemon
+10,tak,nie,ro≈õlinny

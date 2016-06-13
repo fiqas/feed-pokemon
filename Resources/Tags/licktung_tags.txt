@@ -1,5 +1,3 @@
 Licktung
-ró¿owy
-normalny
-jêzyk
 pokemon
+50,tak,nie,normalny

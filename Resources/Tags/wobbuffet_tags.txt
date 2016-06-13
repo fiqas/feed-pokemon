@@ -1,5 +1,3 @@
 Wobbuffet
-niebieski
-psychiczny
-stwór
 pokemon
+50,tak,nie,wodny

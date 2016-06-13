@@ -1,5 +1,3 @@
 Staryu
-br¹zowy
-wodny
-gwiazdka
 pokemon
+10,tak,nie,wodny

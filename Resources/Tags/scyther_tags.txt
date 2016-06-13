@@ -1,5 +1,3 @@
 Scyther
-zielony
-roœlinny
-modliszka
 pokemon
+40,tak,nie,roslinny,sredni_kotlet_sojowy_z_kasza

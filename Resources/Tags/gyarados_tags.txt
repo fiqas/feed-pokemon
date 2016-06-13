@@ -1,5 +1,3 @@
 Gyarados
-niebieski
-wodny
-w¹¿
 pokemon
+80,nie,nie,wodny

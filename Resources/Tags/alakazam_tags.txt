@@ -1,5 +1,3 @@
 Alakazam
-br¹zowy
-psychiczny
-dziadek
 pokemon
+20,nie,nie,psychiczny

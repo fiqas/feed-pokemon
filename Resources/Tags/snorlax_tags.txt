@@ -1,5 +1,3 @@
 Snorlax
-bia³o-niebieski
-normalny
-œpioch
 pokemon
+120,nie,nie,normalny

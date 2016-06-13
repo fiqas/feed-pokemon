@@ -1,5 +1,3 @@
 Ninetales
-kremowy
-ognisty
-lis
 pokemon
+50,nie,nie,ognisty

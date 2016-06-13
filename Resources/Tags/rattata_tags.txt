@@ -1,5 +1,3 @@
 Rattata
-fioletowy
-normalny
-szczur
 pokemon
+5,nie,nie,normalny

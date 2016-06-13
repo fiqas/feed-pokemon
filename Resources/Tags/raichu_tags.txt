@@ -1,5 +1,3 @@
 Raichu
-¿ó³ty
-elektryczny
-mysz
 pokemon
+5,nie,nie,elektryczny,motyle_w_zalewie_serowej

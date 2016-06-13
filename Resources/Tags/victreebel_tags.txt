@@ -1,5 +1,3 @@
 Victreebel
-¿ó³ty
-roœlinny
-kwiatek
 pokemon
+50,tak,nie,roslinny
