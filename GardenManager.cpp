@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 
 
 GardenManager::GardenManager(void) {
@@ -6,10 +6,10 @@ GardenManager::GardenManager(void) {
 	LoadNeuralNetwork();
 
 	theWorld.SetupPhysics(Vector2(0.0f, 0.0f));		// Ustawienie fizyki, potrzebne by Pikachu 
-	theWorld.LoadLevel("pokemon_garden_level");	    // Wczytujemy plik ze statycznymi elementami œwiata tj. drzewa, p³ot oraz ziemia.
+	theWorld.LoadLevel("pokemon_garden_level");	    // Wczytujemy plik ze statycznymi elementami Å“wiata tj. drzewa, pÂ³ot oraz ziemia.
 	
 	pikachu = new Pikachu();
-	AddPokemons();									//Funkcje dodaj¹ce odpowiednio kolzje do Pokemonów, managerów kolizji
+	AddPokemons();									//Funkcje dodajÂ¹ce odpowiednio kolzje do PokemonÃ³w, managerÃ³w kolizji
 	AddCollisionManager();
 	
 	theWorld.Add(pikachu);
@@ -27,12 +27,12 @@ GardenManager::GardenManager(void) {
 	theWorld.Add(text_screen);
 	theWorld.Add(text);
 	
-	//Tworzenie grafu po którym bêdzie porusza³ siê Pikachu.
+	//Tworzenie grafu po ktÃ³rym bÃªdzie poruszaÂ³ siÃª Pikachu.
 	BoundingBox bounds(Vector2(-20, -20), Vector2(20, 20));
 	theSpatialGraph.CreateGraph( 1.0f, bounds);
 	theSpatialGraph.EnableDrawGraph(true);
 
-	//Pikachu reaguje na nastêpuj¹ce "wiadomoœci":
+	//Pikachu reaguje na nastÃªpujÂ¹ce "wiadomoÅ“ci":
 	theSwitchboard.SubscribeTo(this, "GoTo");
 	theSwitchboard.SubscribeTo(this, "UpdateStatistics");
 	theSwitchboard.SubscribeTo(this, "InspectDishes");
@@ -61,7 +61,6 @@ GardenManager::GardenManager(void) {
 	}
 
 	std::cout << "Loaded targets" << std::endl;
-
 }
 
 GardenManager::~GardenManager(void) {
@@ -88,7 +87,7 @@ void GardenManager::LoadNeuralNetwork() {
 }
 
 //Wersja nieodpytujaca sieci neuronowej skryptem Pythonowym, odkomentowac 
-//i zakomentowac to na dole, jak nie ma siê zainstalowanej Anacondy z PyBrain i OpenCV
+//i zakomentowac to na dole, jak nie ma siÃª zainstalowanej Anacondy z PyBrain i OpenCV
 
 //bool GardenManager::CheckDish(String number, String pick) {
 //	String key = number + "_" + pick;
@@ -133,12 +132,48 @@ void GardenManager::InspectDishes() {
 
 }
 
+Actor* GardenManager::FindMaxTime(String tag) {
+	int max_time = -1;
+	Actor* max_temp = (*pokemons.begin());
+	CollisionManager* max;
+	max = dynamic_cast < CollisionManager* >(max_temp);
+
+	for(ActorSet::iterator itr1 = pokemons.begin(); itr1 != pokemons.end(); itr1++ ) {
+
+		Actor* customer_temp = (*itr1);
+		CollisionManager* customer;
+		customer = dynamic_cast < CollisionManager* >(customer_temp);
 
 
-//Tutaj bedzie funkcja wybierajaca do ktorego Pokemona ma podejsc.
+		if (customer->IsTagged(tag) && customer->pokemons_since_last_visited > max_time && customer!=pikachu->customer_served) {
+			max = customer;
+			max_time = max->pokemons_since_last_visited;
+			std::cout << max_time << " " << customer->pokemons_since_last_visited << " " << std::endl;
+		}
+	}
+
+	return max;
+}
+
+
+//funkcja wybierajaca do ktorego Pokemona ma podejsc.
 Actor* GardenManager::ChooseTarget() {
+	
+	system("python target_program.py");
 
-	Actor* target;
+	std::fstream file;
+	file.open("target_result", std::ios::in);
+	String target_state;
+
+	if( file.good() ) {
+		while ( !file.eof() ) {
+			getline(file, target_state);
+		}
+		file.close();
+	}
+	
+	Actor* target = FindMaxTime(target_state);
+	std::cout << "choose target from " << target_state << std::endl; 
 	return target;
 }
 
@@ -146,6 +181,8 @@ void GardenManager::MouseDownEvent(Vec2i screenCoordinates, MouseButtonInput but
 	
 	if(button == MOUSE_LEFT) {
 		if (*counterPtr < TargetList.size()) {
+			pikachu->chat->SetDisplayString("");
+			pikachu->chat_screen->SetAlpha(0.0f);
 			Analyze(*counterPtr);
 		}
 
@@ -183,22 +220,76 @@ void GardenManager::ReceiveMessage(Message* message) {
 	
 }
 
+void GardenManager::SaveGarden(int waiter_counter, int bill_counter, String max) {
+
+	std::ofstream file;
+	file.open("garden.csv", std::ios::out);
+
+	if( file.good() ) {
+		file << pikachu->last_mode << "," << max << "," << waiter_counter << "," << bill_counter << std::endl;
+		file.close();
+	}
+}
+
 void GardenManager::UpdatePokemonStatistics() {
+
+	waiter_counter = 0;
+	bill_counter = 0;
+	max_cnk = 0;
+	max_cnr = 0;
+
 	for(ActorSet::iterator itr1 = pokemons.begin(); itr1 != pokemons.end(); itr1++ ) {
 		Actor* waiting_customer_temp = (*itr1);
 		CollisionManager* waiting_customer;
 		waiting_customer = dynamic_cast < CollisionManager* >(waiting_customer_temp);
+
 		waiting_customer->pokemons_since_last_visited += 1;
 		waiting_customer->walked_since_last_visited += pikachu->distanceWalked;
 
 		//Tutaj jest warunek, ktory powoduje, ze pokemon zjadl i talerz zamienia sie na pusty.
-		//Narazie na chama robi, ze jak Pikachu odwiedzi 3 pokemony po pokemonie X, to Pokemon X zdazyl zjesc.
-		if(waiting_customer->pokemons_since_last_visited >= 3 && waiting_customer->IsTagged("JE")) {
+		if(waiting_customer->pokemons_since_last_visited >= waiting_customer->will_eat_after && waiting_customer->IsTagged("JE")) {
 			std::cout << "CZYSZCZE TALERZ POKEMONA " << waiting_customer->GetName() << std::endl;
 			waiting_customer->EmptyDish();
-		}
+			waiting_customer->Tag("CZEKA_NA_RACHUNEK");
+			
+			waiting_customer->ShowExclamation();
 
+			waiting_customer->SetWillOrderAfter();
+			waiting_customer->SetWillEatAfter();
+		}
+		/*else if(waiting_customer->pokemons_since_last_visited >= waiting_customer->will_order_after && waiting_customer->IsTagged("ODPOCZYWA")) {
+			waiting_customer->Untag("ODPOCZYWA");
+			waiting_customer->HideDish();
+			waiting_customer->ShowExclamation();
+
+			waiting_customer->Tag("CZEKA_NA_KELNERA");
+		}*/
+
+
+		//przygotowanie inputu do drzewa z nastepnym klientem
+		if(waiting_customer->IsTagged("CZEKA_NA_KELNERA")) {
+			waiter_counter++;
+			if (waiting_customer->pokemons_since_last_visited > max_cnk)
+				max_cnk = waiting_customer->pokemons_since_last_visited;
+		}
+		else if(waiting_customer->IsTagged("CZEKA_NA_RACHUNEK")) {
+			bill_counter++;
+			int since_eaten = waiting_customer->pokemons_since_last_visited - waiting_customer->will_eat_after;
+			if (since_eaten > max_cnr)
+				max_cnr = since_eaten;
+		}
 	}
+		
+	String max;
+	if (max_cnk > max_cnr) {
+		max = "CZEKA_NA_KELNERA";
+	}
+	else {
+		max = "CZEKA_NA_RACHUNEK";
+	}
+
+	SaveGarden(waiter_counter,bill_counter,max);
+
 	theSwitchboard.Broadcast(new Message("InspectDishes"));
 
 }
@@ -211,14 +302,13 @@ void GardenManager::Analyze(int toDo) {
 
 	theSound.PlaySound(pikachuOrder);
 
-	ActorSet::iterator itr1 = named_pokemon.begin();
-	Actor* visited_customer_temp = (*itr1);
+	Actor* visited_customer_temp = ChooseTarget();
 	CollisionManager* visited_customer = dynamic_cast < CollisionManager* >(visited_customer_temp);
 	TypedMessage<Vector2> *m = new TypedMessage<Vector2>("GoTo", visited_customer->_side);
 	theSwitchboard.Broadcast(m);
-	std::cout << "GOING TO " << visited_customer->GetName() << std::endl;
+	std::cout << "GOING TO " << visited_customer->GetName() << " waited " << visited_customer->pokemons_since_last_visited << std::endl;
 	pikachu->customer_served = visited_customer;
-	
+	pikachu->customer_served->pokemons_since_last_visited = 0;
 }
 
 void GardenManager::Text(String display_text) {
@@ -240,7 +330,7 @@ void GardenManager::CloseText() {
 //	ActorSet adjectiveTaggedActors;
 //	ActorSet nounTaggedActors;
 //
-//	if(!adjective.empty()) { //je¿eli przymiotnik istnieje i string nie jest pusty
+//	if(!adjective.empty()) { //jeÂ¿eli przymiotnik istnieje i string nie jest pusty
 //
 //		adjectiveTaggedActors = theTagList.GetObjectsTagged(adjective);
 //
@@ -248,7 +338,7 @@ void GardenManager::CloseText() {
 //		
 //	} 
 //
-//	if(!noun.empty()) { //je¿eli rzeczownik istnieje i string nie jest pusty
+//	if(!noun.empty()) { //jeÂ¿eli rzeczownik istnieje i string nie jest pusty
 //
 //		nounTaggedActors = theTagList.GetObjectsTagged(noun);
 //	

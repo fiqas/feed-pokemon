@@ -1,6 +1,7 @@
 #pragma once
 #include "stdafx.h"
 
+
 class Pikachu : public Actor, public MouseListener {
 public:
 	Pikachu();
@@ -27,6 +28,7 @@ public:
 	float distance;
 	double Angle(Vector2 position, Vector2 destination);
 	Vector2 currentPosition;
+	String last_mode;
 	float distanceWalked;
 
 	bool walkingright;

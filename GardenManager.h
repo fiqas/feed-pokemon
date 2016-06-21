@@ -14,6 +14,8 @@ public:
 	void CreateCollisionManager(float x, float y ,  float sx, float sy, String pathTag, Vector2 side, String number);
 	void AddCollisionManager();
 	void AddPokemons();
+	Actor* FindMaxTime(String tag);
+	void SaveGarden(int waiter_counter, int bill_counter, String max);
 	void Update(float dt);
 	void ReceiveMessage(Message* message);
 	void Text(String display_text);
@@ -44,6 +46,12 @@ public:
 	
 	int counter;
 	int* counterPtr;
+
+	int waiter_counter;
+	int bill_counter;
+
+	int max_cnr;
+	int max_cnk;
 
 	std::vector <String> TargetList;
 

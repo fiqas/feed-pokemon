@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Pikachu.h"
 #include <cstdlib>
 
@@ -10,6 +10,7 @@ Pikachu::Pikachu(void) {
 	LoadSpriteFrames("Resources/Images/pikachu/pikachu_001.png", GL_CLAMP, GL_LINEAR);
 	SetSpriteFrame(2);
 	SetLayer(3);
+	last_mode = "CZEKA_NA_KELNERA";
 
 	walkingright = false;
 	walkingleft = false;
@@ -36,8 +37,8 @@ Pikachu::Pikachu(void) {
 	theSwitchboard.SubscribeTo(this, "GoingRight");
 	theSwitchboard.SubscribeTo(this, "GoingUp");
 	theSwitchboard.SubscribeTo(this, "GoingDown");
-	theSwitchboard.SubscribeTo(this, "PathPointReached");  //Osi¹gniêcie wierzcho³ka grafu
-	theSwitchboard.SubscribeTo(this, "EndPointReached");   //Zakoñczenie wyznaczonej œcie¿ki
+	theSwitchboard.SubscribeTo(this, "PathPointReached");  //OsiÂ¹gniÃªcie wierzchoÂ³ka grafu
+	theSwitchboard.SubscribeTo(this, "EndPointReached");   //ZakoÃ±czenie wyznaczonej Å“cieÂ¿ki
 
 	happyPikachuSound = theSound.LoadSample("Resources/Sounds/happyPikachuSound.mp3", false);
 	sadPikachuSound = theSound.LoadSample("Resources/Sounds/sadPikachuSound.wav", false);
@@ -56,7 +57,7 @@ Pikachu::~Pikachu(void) {
 
 void Pikachu::GoTo(Vector2 newDestination) { 
 
-	//Funkcja tworz¹ca œcie¿kê.
+	//Funkcja tworzÂ¹ca Å“cieÂ¿kÃª.
 	Vector2List pathTest;
 	theSpatialGraph.GetPath(GetPosition(), newDestination, pathTest);
 	distanceWalked = 0;
@@ -75,7 +76,7 @@ void Pikachu::GoTo(Vector2 newDestination) {
 void Pikachu::GetToNextPoint() { 
 
 	//Ta funkcja jest odpowiedzialna za puszczanie odpowiedniej animacji
-	//oraz za samo chodzenie po wierzcho³kach grafu.
+	//oraz za samo chodzenie po wierzchoÂ³kach grafu.
 
 	Vector2 next = _pathPoints[++_pathIndex];
 	distance = Vector2::Distance(_position, next);
@@ -83,7 +84,7 @@ void Pikachu::GetToNextPoint() {
 	time = distance / 4.0f;
 	angle = Angle(Vector2(10,0), Vector2(next.X - GetPosition().X, next.Y - GetPosition().Y));	
 
-	//Opracowanie w któr¹ stronê Pikachu wykona ruch.
+	//Opracowanie w ktÃ³rÂ¹ stronÃª Pikachu wykona ruch.
 
 	if ((angle >= 0 && angle < 30) || (angle <= 360 && angle > 330)) theSwitchboard.Broadcast(new Message("GoingRight"));
 	else if (angle >= 30 && angle < 150) theSwitchboard.Broadcast(new Message("GoingUp"));
@@ -99,7 +100,7 @@ void Pikachu::GetToNextPoint() {
 
 double Pikachu::Angle(Vector2 position, Vector2 destination) {
 
-	//Funkcja obliczaj¹ca k¹t miêdzy dwoma wektorami.
+	//Funkcja obliczajÂ¹ca kÂ¹t miÃªdzy dwoma wektorami.
 
 	scalar = position.X * destination.X + position.Y * destination.Y;
     positionlength = sqrt(pow(position.X, 2) + pow(position.Y, 2));
@@ -147,47 +148,57 @@ void Pikachu::Talk() {
 	theSound.PlaySound(pikachuDialoguePokemon);
 
 	if(customer_served->IsTagged("CZEKA_NA_KELNERA")) {
+		last_mode = "CZEKA_NA_KELNERA";
 		customer_served->FillDish("1");
 		customer_served->Untag("CZEKA_NA_KELNERA");
 		Proposition(customer_served->GetName());
+		
+		std::fstream file;
+		file.open("result", std::ios::in);
+		String result;
+
+		if( file.good() ) {
+			while ( !file.eof() ) {
+				getline(file, result);
+			}
+			file.close();
+		}	
+
+		String proposition = customer_served->GetName() + " : " + result ;
+		chat_screen->SetSprite("Resources/Images/text_001.png", 0.5, GL_CLAMP, GL_LINEAR);
+		chat_screen->SetAlpha(1.0f);
+		chat_screen->SetLayer(10);
+		chat->SetDisplayString(proposition);
+
 		customer_served->Tag("JE");
 	}
+	else if(customer_served->IsTagged("CZEKA_NA_RACHUNEK")) {
+		last_mode = "CZEKA_NA_RACHUNEK";
+		customer_served->Untag("CZEKA_NA_RACHUNEK");
+		customer_served->Tag("ODPOCZYWA");
+		customer_served->HideDish();
+	}
+
+	customer_served->HideExclamation();
 	
-	std::fstream file;
-	file.open("result", std::ios::in);
-	String result;
 
-	if( file.good() ) {
-		while ( !file.eof() ) {
-			getline(file, result);
-		}
-		file.close();
-	}	
-
-	String proposition = customer_served->GetName() + " : " + result ;
-	chat_screen->SetSprite("Resources/Images/text_001.png", 0.5, GL_CLAMP, GL_LINEAR);
-	chat_screen->SetLayer(10);
-	chat->SetDisplayString(proposition);
-
-	//else if(customer_served->IsTagged("CZEKA_NA_RACHUNEK")) {
-	//	customer_served->FillDish("1");
-	//}
 	customer_served->pokemons_since_last_visited = 0;
 	customer_served->walked_since_last_visited = 0;
 	theSwitchboard.Broadcast(new Message("UpdateStatistics"));
+	std::cout << "talk" << std::endl;
 }
 
 void Pikachu::ReceiveMessage(Message* message) {
 
 	if ( (message->GetMessageName() == "PathPointReached") && (message->GetSender() == this) ) { 
 
-		//Zosta³a odebrana wiadomoœæ o dotarciu do wierzcho³ka grafu, ktory jest zawarty w naszej œcie¿ce.
+		//ZostaÂ³a odebrana wiadomoÅ“Ã¦ o dotarciu do wierzchoÂ³ka grafu, ktory jest zawarty w naszej Å“cieÂ¿ce.
 		
 		if (_pathIndex < _pathPoints.size() - 1) GetToNextPoint();
 
 		else {
 
-			//Kiedy przeszliœmy przez wszystkie wierzcho³ki na naszej œcie¿ce.
+			//Kiedy przeszliÅ“my przez wszystkie wierzchoÂ³ki na naszej Å“cieÂ¿ce.
 			theSwitchboard.Broadcast(new Message("EndPointReached", this));
 			_pathPoints.clear();
 			_pathIndex = 0;
@@ -201,10 +212,10 @@ void Pikachu::ReceiveMessage(Message* message) {
 
 	else if (message->GetMessageName() == "EndPointReached") {
 			
-			//Kiedy dotrzemy do celu warto by³oby zastopowaæ animacjê, w tym celu ustawiona zostaje odpowiednia klatka
-			//w zale¿noœci od kierunku poruszania siê postaci.
-			//Pikachu niestety nie mieli nó¿kami w czasie przechodzenia po grafie,
-			//dopiero robi to po zatrzymaniu siê. Dziêki temu nie mieli nó¿kami w nieskoñczonoœæ.
+			//Kiedy dotrzemy do celu warto byÂ³oby zastopowaÃ¦ animacjÃª, w tym celu ustawiona zostaje odpowiednia klatka
+			//w zaleÂ¿noÅ“ci od kierunku poruszania siÃª postaci.
+			//Pikachu niestety nie mieli nÃ³Â¿kami w czasie przechodzenia po grafie,
+			//dopiero robi to po zatrzymaniu siÃª. DziÃªki temu nie mieli nÃ³Â¿kami w nieskoÃ±czonoÅ“Ã¦.
 
 		if (walkingright) SetSpriteFrame(13);						
 		else if (walkingleft) SetSpriteFrame(9);
@@ -213,8 +224,8 @@ void Pikachu::ReceiveMessage(Message* message) {
 
 	}
 
-	// Poni¿sze funkcje ustawiaj¹ wartoœci true/false dotycz¹ce kierunku poruszania siê postaci
-	// a tak¿e graj¹ odpowiedni¹ animacjê.
+	// PoniÂ¿sze funkcje ustawiajÂ¹ wartoÅ“ci true/false dotyczÂ¹ce kierunku poruszania siÃª postaci
+	// a takÂ¿e grajÂ¹ odpowiedniÂ¹ animacjÃª.
 
 	else if (message->GetMessageName() == "GoingRight") {
 
